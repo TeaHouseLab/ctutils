@@ -1,0 +1,13 @@
+function help_echo
+ echo '
+(./)app [swap/*/h]
+
+    swap: refresh swap with cache
+
+    *: only refresh cache
+
+    v/version: Show Version
+
+    h/help: Show this msg
+'
+end

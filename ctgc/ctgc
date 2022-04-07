@@ -1,0 +1,78 @@
+#!/usr/bin/env fish
+
+function logger-warn
+  set_color magenta
+  echo "$prefix [Warn] $argv[1..-1]"
+  set_color normal
+end
+function logger-error
+  set_color red
+  echo "$prefix [Error] $argv[1..-1]"
+  set_color normal
+end
+function logger-info
+  set_color normal
+  echo "$prefix [Info] $argv[1..-1]"
+  set_color normal
+end
+function logger-debug
+  set_color yellow
+  echo "$prefix [Debug] $argv[1..-1]"
+  set_color normal
+end
+function logger-success
+  set_color green
+  echo "$prefix [Succeeded] $argv[1..-1]"
+  set_color normal
+end
+function logger -d "a lib to print msg quickly"
+switch $argv[1]
+case 0
+  logger-info $argv[2..-1]
+case 1
+  logger-success $argv[2..-1]
+case 2
+  logger-debug $argv[2..-1]
+case 3
+  logger-warn $argv[2..-1]
+case 4
+  logger-error $argv[2..-1]
+end
+end
+
+function help_echo
+ echo '
+(./)app [swap/*/h]
+
+    swap: refresh swap with cache
+
+    *: only refresh cache
+
+    h: show this msg
+'
+end
+
+echo Build_Time_UTC=2022-04-07_05:39:33
+set -lx prefix '[ctgc]'
+switch $argv[1]
+    case h help
+        help_echo
+    case swap
+        sudo sync
+        echo 1 | sudo tee /proc/sys/vm/drop_caches &>/dev/null
+        sudo sync
+        echo 2 | sudo tee /proc/sys/vm/drop_caches &>/dev/null
+        sudo sync
+        echo 3 | sudo tee /proc/sys/vm/drop_caches &>/dev/null
+        sudo swapoff -a
+        sudo swapon -a
+        logger 1 'Cache and swap refreshed'
+    case '*'
+        sudo sync
+        echo 1 | sudo tee /proc/sys/vm/drop_caches &>/dev/null
+        sudo sync
+        echo 2 | sudo tee /proc/sys/vm/drop_caches &>/dev/null
+        sudo sync
+        echo 3 | sudo tee /proc/sys/vm/drop_caches &>/dev/null
+        logger 1 'Cache refreshed'
+end

@@ -1,0 +1,18 @@
+function help_echo
+ echo '
+(./)app [switch/*/h] argv[1]
+
+    switch: Switch nvidia backend
+    
+        argv[1] -> backend
+        (1) Prime Render Offload
+        (2) Bumblebee
+        (3) Primus
+    
+    *: Setting up Elf
+    
+    v/version: Show Version
+
+    h/help: Show this msg
+'
+end

@@ -1,0 +1,24 @@
+function help_echo
+ echo '
+(./)app [xray, hysteria, ssh, h, v] argv[1] argv[2]
+
+    xray: Query Xray user usage
+        argv[1] -> the path of xray-core
+            default: xray
+        argv[2] -> the address of xray api server
+            default: 127.0.0.1:10085
+    Example: (./app) xray /opt/xray/xray 127.0.0.1:10085
+
+    hysteria: Query hysteria user usage
+        argv[1] -> the address of hysteria api server
+            default: 127.0.0.1:10086
+    Example: (./app) hysteria 127.0.0.1:10086
+
+    ssh: Query ssh auth log
+    Exaple: (./app) ssh
+
+    v/version: Show Version
+
+    h/help: Show this msg
+    '
+end

@@ -1,0 +1,14 @@
+This is the repo of ctutils
+
+What is Ctutils?
+Ctutils is a toolkit for centerlinux
+
+What does it provide?
+ctgc (ram and swap cleaner)
+ctnvswitch (a wrapper to run applications with nvidia card)
+anyquery (a status collector)
+
+How to install it?
+Install ctpkg first https://ruzhtw.top/2022/03/30/How-to-install-ctpkg
+Then
+$ ctpkg grab ctutils
