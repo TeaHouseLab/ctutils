@@ -1,0 +1,108 @@
+#!/usr/bin/env fish
+
+function help_echo
+ echo '
+(./)app [switch, h, *] argv[1]
+
+    switch: Switch nvidia backend
+    
+        argv[1] -> backend
+        (1) Prime Render Offload
+        (2) Bumblebee
+        (3) Primus
+    
+    *: Setting up Elf
+    
+    v/version: Show Version
+
+    h/help: Show this msg
+'
+end
+
+function logger-warn
+  set_color magenta
+  echo "$prefix [Warn] $argv[1..-1]"
+  set_color normal
+end
+function logger-error
+  set_color red
+  echo "$prefix [Error] $argv[1..-1]"
+  set_color normal
+end
+function logger-info
+  set_color normal
+  echo "$prefix [Info] $argv[1..-1]"
+  set_color normal
+end
+function logger-debug
+  set_color yellow
+  echo "$prefix [Debug] $argv[1..-1]"
+  set_color normal
+end
+function logger-success
+  set_color green
+  echo "$prefix [Succeeded] $argv[1..-1]"
+  set_color normal
+end
+function logger -d "a lib to print msg quickly"
+switch $argv[1]
+case 0
+  logger-info $argv[2..-1]
+case 1
+  logger-success $argv[2..-1]
+case 2
+  logger-debug $argv[2..-1]
+case 3
+  logger-warn $argv[2..-1]
+case 4
+  logger-error $argv[2..-1]
+end
+end
+
+function tui
+    logger 0 "Choose the backend you want to use"
+    logger 0 '[1]Prime Render Offload'
+    logger 0 '[2]Bumblebee'
+    logger 0 '[3]Primus'
+    read -n1 -P "[ctnvswitch] >>>" select
+    switcher $select
+end
+
+function switcher
+    switch $argv[1]
+        case 1
+            echo '#!/bin/sh
+vblank_mode=0 __GL_SYNC_TO_VBLANK=0 __NV_PRIME_RENDER_OFFLOAD=1 __VK_LAYER_NV_optimus=NVIDIA_only __GLX_VENDOR_LIBRARY_NAME=nvidia "$@"' | sudo tee /usr/bin/ctnvrun &>/dev/null
+        case 2
+            echo '#!/bin/sh
+vblank_mode=0 __GL_SYNC_TO_VBLANK=0 optirun -b primus -c vuy "$@"' | sudo tee /usr/bin/ctnvrun &>/dev/null
+        case 3
+            echo '#!/bin/sh
+vblank_mode=0 __GL_SYNC_TO_VBLANK=0 primusrun "$@"' | sudo tee /usr/bin/ctnvrun &>/dev/null
+        case '*'
+            logger 4 'Unexpected Input at switch.switcher.ctnvswitch'
+    end
+    logger 1 'Switched.'
+end
+
+echo Build_Time_UTC=2022-04-10_02:55:11
+set -lx prefix [ctnvswitch]
+switch $argv[1]
+    case switch
+        switch $argv[2]
+            case 1
+                switcher 1
+            case 2
+                switcher 2
+            case 3
+                switcher 3
+            case '*'
+                logger 4 'Unexpected Input at switch.MainActivity.ctnvswitch'
+        end
+    case v version
+        logger 0 'Corleone@build1'
+    case h help
+        help_echo
+    case '*'
+        tui
+end

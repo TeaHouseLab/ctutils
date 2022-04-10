@@ -42,17 +42,19 @@ end
 
 function help_echo
  echo '
-(./)app [swap/*/h]
+(./)app [swap, h, *]
 
     swap: refresh swap with cache
 
     *: only refresh cache
 
-    h: show this msg
+    v/version: Show Version
+
+    h/help: Show this msg
 '
 end
 
-echo Build_Time_UTC=2022-04-07_05:39:33
+echo Build_Time_UTC=2022-04-10_02:54:57
 set -lx prefix '[ctgc]'
 switch $argv[1]
     case h help
@@ -67,6 +69,8 @@ switch $argv[1]
         sudo swapoff -a
         sudo swapon -a
         logger 1 'Cache and swap refreshed'
+    case v version
+        logger 0 'Corleone@build1'
     case '*'
         sudo sync
         echo 1 | sudo tee /proc/sys/vm/drop_caches &>/dev/null

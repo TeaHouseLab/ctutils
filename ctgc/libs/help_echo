@@ -1,6 +1,6 @@
 function help_echo
  echo '
-(./)app [swap/*/h]
+(./)app [swap, h, *]
 
     swap: refresh swap with cache
 

@@ -1,6 +1,6 @@
 function help_echo
  echo '
-(./)app [switch/*/h] argv[1]
+(./)app [switch, h, *] argv[1]
 
     switch: Switch nvidia backend
     
