@@ -12,3 +12,5 @@ How to install it?
 Install ctpkg first https://ruzhtw.top/2022/03/30/How-to-install-ctpkg
 Then
 $ ctpkg grab ctutils
+
+All projects under this repo is published with GPLV3 License
