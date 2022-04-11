@@ -1,0 +1,178 @@
+#!/usr/bin/env fish
+
+function help_echo
+ echo '
+(./)app [xray, hysteria, ssh, h, v] argv[1] argv[2]
+
+    xray: Query Xray user usage
+        argv[1] -> the path of xray-core
+            default: xray
+        argv[2] -> the address of xray api server
+            default: 127.0.0.1:10085
+    Example: (./app) xray /opt/xray/xray 127.0.0.1:10085
+
+    hysteria: Query hysteria user usage
+        argv[1] -> the address of hysteria api server
+            default: 127.0.0.1:10086
+    Example: (./app) hysteria 127.0.0.1:10086
+
+    ssh: Query ssh auth log
+    Exaple: (./app) ssh
+
+    v/version: Show Version
+
+    h/help: Show this msg
+    '
+end
+
+function size
+    set size1239_calcamount $argv[1]
+    if [ "$size1239_calcamount" -ge 0 ]
+        set size1239_printamount (math -s2 $size1239_calcamount/1)
+        set size1239_scale b
+    end
+    if [ "$size1239_calcamount" -ge 8 ]
+        set size1239_printamount (math -s2 $size1239_calcamount/8)
+        set size1239_scale B
+    end
+    if [ "$size1239_calcamount" -ge 8192 ]
+        set size1239_printamount (math -s2 $size1239_calcamount/8192)
+        set size1239_scale KB
+    end
+    if [ "$size1239_calcamount" -ge 8388608 ]
+        set size1239_printamount (math -s2 $size1239_calcamount/8388608)
+        set size1239_scale MB
+    end
+    if [ "$size1239_calcamount" -ge 8589934592 ]
+        set size1239_printamount (math -s2 $size1239_calcamount/8589934592)
+        set size1239_scale GB
+    end
+    if [ "$size1239_calcamount" -ge 8796093022208 ]
+        set size1239_printamount (math -s2 $size1239_calcamount/8796093022208)
+        set size1239_scale TB
+    end
+    if [ "$size1239_calcamount" -ge 9007199254741000 ]
+        set size1239_printamount (math -s2 $size1239_calcamount/9007199254741000)
+        set size1239_scale PB
+    end
+    echo $size1239_printamount $size1239_scale
+end
+function logger-warn
+  set_color magenta
+  echo "$prefix [Warn] $argv[1..-1]"
+  set_color normal
+end
+function logger-error
+  set_color red
+  echo "$prefix [Error] $argv[1..-1]"
+  set_color normal
+end
+function logger-info
+  set_color normal
+  echo "$prefix [Info] $argv[1..-1]"
+  set_color normal
+end
+function logger-debug
+  set_color yellow
+  echo "$prefix [Debug] $argv[1..-1]"
+  set_color normal
+end
+function logger-success
+  set_color green
+  echo "$prefix [Succeeded] $argv[1..-1]"
+  set_color normal
+end
+function logger -d "a lib to print msg quickly"
+switch $argv[1]
+case 0
+  logger-info $argv[2..-1]
+case 1
+  logger-success $argv[2..-1]
+case 2
+  logger-debug $argv[2..-1]
+case 3
+  logger-warn $argv[2..-1]
+case 4
+  logger-error $argv[2..-1]
+end
+end
+
+function xray_query
+    set xraycore $argv[1]
+    if [ "$xraycore" = "" ]
+        set xraycore xray
+    end
+    set xrayserver $argv[2]
+    if [ "$xrayserver" = "" ]
+        set xrayserver 127.0.0.1:10085
+    end
+    logger 0 '-----Xray Query-----'
+    set raw ($xraycore api statsquery -s $xrayserver -pattern "user" | jq '.stat')
+    set usercount (echo "$raw" | jq | grep name | count)
+    set fixedcount (math $usercount-1)
+    for users in (seq 0 $fixedcount)
+        set lookupchart (math $users+1)
+        set name (echo "$raw" | jq ".[$users].name" | sed 's/\"user>>>//g' | sed 's/>>traffic>>>//g' | sed 's/k\"/k/g')
+        set amount (echo "$raw" | jq ".[$users].value")
+        set printamount (size (math "$amount"x 8))
+        set sort[$lookupchart] "$name $printamount"
+    end
+    for reader in (seq 1 $usercount)
+        echo $sort[$reader]
+    end | sort
+end
+
+function hysteria_query
+    set hysteriaserver $argv[2]
+    if [ "$hysteriaserver" = "" ]
+        set hysteriaserver 127.0.0.1:10086
+    end
+    logger 0 '-----Hysteria Query-----'
+    set raw (curl -sL $hysteriaserver/metrics | sed '/\#/d' | grep traffic)
+    set usercount (math (echo $raw | tr ' ' '\n' | count)/2)
+    for users in (seq 1 $usercount)
+        set string (echo $raw | tr ' ' '\n' | sed -n (math $users x 2-1)p)
+        set name (echo $string | awk -F"[\"\"]" '{print $2}' | base64 -d )
+        if echo $string | grep -qs uplink
+            set route uplink 
+        end
+        if echo $string | grep -qs uplink
+            set route uplink 
+        end
+        if echo $string | grep -qs downlink
+            set route downlink 
+        end
+        set amount (echo $raw | tr ' ' '\n' | sed -n (math $users x 2)p)
+        set printamount (size (math "$amount"x 8))
+        set sort[$users] ""$name">"$route" "$printamount""
+    end
+    for reader in (seq 1 $usercount)
+        echo $sort[$reader]
+    end | sort
+end
+function ssh_query
+    logger 0 '-----SSHauth Query-----'
+    set_color green
+    echo ">Accepted<"
+    set_color normal
+    journalctl -et sshd -n 150 | grep -F Accepted
+    set_color red
+    echo ">Rejected<"
+    set_color normal
+    journalctl -et sshd -n 150 | grep -F Failed
+end
+
+echo Build_Time_UTC=2022-04-11_12:11:17
+set -lx prefix '[anyquery]'
+switch $argv[1]
+    case xray
+        xray_query $argv[2] $argv[3]
+    case hysteria
+        hysteria_query $argv[2]
+    case ssh
+        ssh_query
+    case v version
+        logger 0 'QuickSliverR@build1'
+    case '*'
+        help_echo
+end

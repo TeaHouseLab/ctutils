@@ -12,7 +12,7 @@ switch $argv[1]
                 logger 4 'Unexpected Input at switch.MainActivity.ctnvswitch'
         end
     case v version
-        logger 0 'Corleone@build1'
+        logger 0 'QuickSliverR@build1'
     case h help
         help_echo
     case '*'

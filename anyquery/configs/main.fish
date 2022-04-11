@@ -7,7 +7,7 @@ switch $argv[1]
     case ssh
         ssh_query
     case v version
-        logger 0 'Corleone@build1'
+        logger 0 'QuickSliverR@build1'
     case '*'
         help_echo
 end

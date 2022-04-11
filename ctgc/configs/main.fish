@@ -13,7 +13,7 @@ switch $argv[1]
         sudo swapon -a
         logger 1 'Cache and swap refreshed'
     case v version
-        logger 0 'Corleone@build1'
+        logger 0 'QuickSliverR@build1'
     case '*'
         sudo sync
         echo 1 | sudo tee /proc/sys/vm/drop_caches &>/dev/null

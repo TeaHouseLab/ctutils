@@ -85,7 +85,7 @@ vblank_mode=0 __GL_SYNC_TO_VBLANK=0 primusrun "$@"' | sudo tee /usr/bin/ctnvrun 
     logger 1 'Switched.'
 end
 
-echo Build_Time_UTC=2022-04-10_02:55:11
+echo Build_Time_UTC=2022-04-11_12:11:57
 set -lx prefix [ctnvswitch]
 switch $argv[1]
     case switch
@@ -100,7 +100,7 @@ switch $argv[1]
                 logger 4 'Unexpected Input at switch.MainActivity.ctnvswitch'
         end
     case v version
-        logger 0 'Corleone@build1'
+        logger 0 'QuickSliverR@build1'
     case h help
         help_echo
     case '*'

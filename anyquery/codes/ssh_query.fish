@@ -3,9 +3,9 @@ function ssh_query
     set_color green
     echo ">Accepted<"
     set_color normal
-    zgrep sshd /var/log/auth.log* -h | grep -F Accepted
+    journalctl -et sshd -n 150 | grep -F Accepted
     set_color red
     echo ">Rejected<"
     set_color normal
-    zgrep sshd /var/log/auth.log* -h | grep -F Failed
+    journalctl -et sshd -n 150 | grep -F Failed
 end
