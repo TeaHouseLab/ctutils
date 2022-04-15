@@ -1,0 +1,82 @@
+#!/usr/bin/env fish
+
+function logger-warn
+  set_color magenta
+  echo "$prefix [Warn] $argv[1..-1]"
+  set_color normal
+end
+function logger-error
+  set_color red
+  echo "$prefix [Error] $argv[1..-1]"
+  set_color normal
+end
+function logger-info
+  set_color normal
+  echo "$prefix [Info] $argv[1..-1]"
+  set_color normal
+end
+function logger-debug
+  set_color yellow
+  echo "$prefix [Debug] $argv[1..-1]"
+  set_color normal
+end
+function logger-success
+  set_color green
+  echo "$prefix [Succeeded] $argv[1..-1]"
+  set_color normal
+end
+function logger -d "a lib to print msg quickly"
+switch $argv[1]
+case 0
+  logger-info $argv[2..-1]
+case 1
+  logger-success $argv[2..-1]
+case 2
+  logger-debug $argv[2..-1]
+case 3
+  logger-warn $argv[2..-1]
+case 4
+  logger-error $argv[2..-1]
+end
+end
+
+function help_echo
+ echo '
+(./)app [d/day, n/night, v/version, h/help/*]
+
+    d/day: Switch to CenterOS kde day(light) theme
+
+    n/night: Switch to CenterOS kde night(dark) theme
+
+    v/version: Show Version
+    
+    h/help/*: Show this msg
+'
+end
+
+function switcher
+    switch $argv
+        case 0
+            kvantummanager --set CenterOS
+            lookandfeeltool -a CenterOS
+        case 1
+            kvantummanager --set CenterOSdark
+            lookandfeeltool -a CenterOSdark
+        case '*'
+            logger 4 "Unexpected Input at switcher.ctkswitch"
+    end
+    logger 0 "Switched"
+end
+
+echo Build_Time_UTC=2022-04-15_04:01:32
+set -lx prefix [ctkswitch]
+switch $argv[1]
+    case d day
+        switcher 0
+    case n night
+        switcher 1
+    case v version
+        logger "QuickSand@build1"
+    case h help '*'
+        help_echo
+end

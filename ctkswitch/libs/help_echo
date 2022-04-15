@@ -1,0 +1,13 @@
+function help_echo
+ echo '
+(./)app [d/day, n/night, v/version, h/help/*]
+
+    d/day: Switch to CenterOS kde day(light) theme
+
+    n/night: Switch to CenterOS kde night(dark) theme
+
+    v/version: Show Version
+    
+    h/help/*: Show this msg
+'
+end
